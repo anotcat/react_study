@@ -30,8 +30,14 @@ function TipCalculator() {
                               onSetSelect={setFriendSelect}>
 
             </SelectPercentage>
-            <Output bill={bill} yourSelect={yourSelect} friendSelect={friendSelect}/>
-            <Reset onReset={handleReset}/>
+            {
+                bill > 0 &&
+                <>
+                    <Output bill={bill} yourSelect={yourSelect} friendSelect={friendSelect}/>
+                    <Reset onReset={handleReset}/>
+                </>
+            }
+
         </div>
     );
 }
