@@ -1,4 +1,5 @@
 import "./AppEatAndSplit.css";
+import {useState} from "react";
 
 const initialFriends = [
     {
@@ -22,17 +23,35 @@ const initialFriends = [
 ];
 
 export default function AppEatAndSplit() {
+    const [addFriend, setAddFriend] = useState(false);
+    const [friends, setFriends] = useState(initialFriends);
+
+    /*
+    注意：
+    区分 handleAddFriend(xx) 普通函数与 组件函数 FriendsList({ xx }) 传入数据的区别。否则会报错接受不到数据
+     */
+    function handleAddFriend(friend) {
+        setFriends(friends => [...friends, friend]);
+    }
+
     return (
         <div className="app">
-            <FriendList/>
+            <div className="sidebar">
+                <FriendsList friends={friends}/>
+                {addFriend && <FormAddFriend onSetFriends={handleAddFriend}/>}
+                <Button onClick={() => setAddFriend((show) => !show)}>
+                    {addFriend ? "Close" : "Add Friend"}
+                </Button>
+            </div>
+            <FormSplitBill/>
         </div>
     );
 }
 
-function FriendList() {
+function FriendsList({friends}) {
     return (
         <div className="sidebar">
-            {initialFriends.map((friend) => <Friend friend={friend} key={friend.id}/>)}
+            {friends.map((friend) => <Friend friend={friend} key={friend.id}/>)}
         </div>
     );
 }
@@ -46,7 +65,59 @@ function Friend({friend}) {
                 <p className="red">you owns your friend {friend.name} ${Math.abs(friend.balance)}</p>}
             {friend.balance === 0 && <p>you and your friend {friend.name} are even</p>}
             {friend.balance > 0 && <p className="green">your friend {friend.name} owens you ${friend.balance}</p>}
-            <button className="button">Select</button>
+            <Button>Select</Button>
         </li>
     );
+}
+
+function FormAddFriend({onSetFriends}) {
+    const [name, setName] = useState("")
+    const [image, setImage] = useState("https://i.pravatar.cc/48")
+
+
+    function handleSubmit(e) {
+        e.preventDefault();
+        if (!name || !image) return;
+        const id = crypto.randomUUID()
+        const newFriend = {
+            id,
+            name,
+            image: `${image}?=${id}`,
+            balance: 0
+        }
+        console.log(newFriend);
+        onSetFriends(newFriend)
+        setName("")
+        setImage("https://i.pravatar.cc/48")
+    }
+
+    return <form className="form-add-friend" onSubmit={handleSubmit}>
+        <label>🤩Friend Name</label>
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)}/>
+        <label>😎Image URL</label>
+        <input type="text" value={image} onChange={(e) => setImage(e.target.value)}/>
+        <Button>Add</Button>
+    </form>
+}
+
+function FormSplitBill() {
+    return <form className="form-split-bill">
+        <h2>SPLIT A BILL WITH X</h2>
+        <label>😋Bill value</label>
+        <input type="number"/>
+        <label>🤑Your expense</label>
+        <input type="number"/>
+        <label>🥰X's expense</label>
+        <input type="number"/>
+        <label>🧐Who is paying the bill?</label>
+        <select>
+            <option>You</option>
+            <option>X's</option>
+        </select>
+        <Button>Add</Button>
+    </form>
+}
+
+function Button({children, onClick}) {
+    return <button className="button" onClick={onClick}>{children}</button>
 }
