@@ -46,6 +46,13 @@ export default function AppEatAndSplit() {
 
     function handleSplitBill(value) {
         console.log(value);
+        console.log(selectedFriend)
+        setFriends((friends) => friends.map(friend => friend.id === selectedFriend.id ?
+            {
+                ...friend,
+                balance: friend.balance + value
+            } : friend));
+        setSelectedFriend(null)
     }
 
     return (
@@ -152,7 +159,7 @@ function FormSplitBill({selectedFriend, onSplitBill}) {
             <option value="usr">You</option>
             <option value={selectedFriend.name}>{selectedFriend.name}'s</option>
         </select>
-        <Button>Add</Button>
+        <Button>Split Bill</Button>
     </form>
 }
 
